@@ -1,0 +1,135 @@
+//Here is the IBM cloud Function  just copy the Entire Code And Paste into IBM cloud function 
+
+var request = require("request");
+ 
+function main(params) {
+    
+    if(params.msg){
+        
+        return {"Greating":"How may I assist you?"};
+    }
+   if(params.news){
+   var options = {
+      url: "https://newsapi.org/v2/top-headlines?sources=bbc-news&apiKey=8499a0d6c4aa468ca44dffd5b0c1bd96",
+      json: true
+   };
+var newsArray = [];
+var author= [];
+   return new Promise(function (resolve, reject) {
+       
+      request(options, function (err, resp) {
+         if (err) {
+            console.log(err);
+            return reject({err: err});
+         }
+       var headLineTitle=resp.body.articles;
+       
+          for(var i in headLineTitle){
+              
+              author.push(headLineTitle[i].author);
+              newsArray.push(headLineTitle[i].title);
+         }
+        
+    return resolve({"HeadLines": newsArray,"Author":headLineTitle[0].author});
+});
+   });
+   }
+   //End News
+
+
+  
+  if(params.types && params.types=="add"){
+      if(params.firstVal!=null && params.secondVal!=null){
+          var f = parseInt(params.firstVal);
+          var s = parseInt(params.secondVal);
+          var tot = f+s;
+      }
+      var myJSON = JSON.stringify(tot);
+      
+       return {"Total":tot};
+  }
+  if(params.types && params.types=="sub"){
+      if(params.firstVal!=null && params.secondVal!=null){
+          var f = parseInt(params.firstVal);
+          var s = parseInt(params.secondVal);
+          var tot = f-s;
+      }
+          return {Total:tot};
+  }
+  
+  if(params.types && params.types=="multi"){
+      if(params.firstVal!=null && params.secondVal!=null){
+          var f = parseInt(params.firstVal);
+          var s = parseInt(params.secondVal);
+          var tot = f*s;
+      }
+       return {Total:tot};
+  }// End Calculator
+  
+  
+  if(params.todayDay){
+      var dateObj = new Date();
+    var week = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+    var wek_day  = week[dateObj.getDay()];
+    
+     
+var month = dateObj.getUTCMonth() + 1; //months from 1-12
+var day = dateObj.getUTCDate();
+var year = dateObj.getUTCFullYear();
+
+newdate = wek_day+","+ day + "/" + month + "/" +year ;
+
+     
+     return {"Today is":wek_day}
+     
+  }//End Date
+  
+   if(params.discovery){
+       
+   //  var request = require('request');
+    var environment_id = 'XYZ';
+    var collection_id = 'XYZ';
+    var input = params.input_txt;
+    var url = 'XYZ'; //|| 'https://gateway.watsonplatform.net';
+
+   var authorization = 'XYZ';
+    // var authorization ='XYZ';
+ 
+   ///* 
+   var qs=
+     { version: '2018-10-15',
+       count: '1',
+       passages: 'true',
+       natural_language_query: input };
+    
+    console.log("QS :" + JSON.stringify(qs,null,2));
+    
+    var promise = new Promise(function(resolve, reject) {request(
+    { method: 'GET',
+    url: url + '/discovery/api/v1/environments/'+environment_id+'/collections/'+collection_id+'/query',qs,
+    headers: 
+     { 
+       authorization: authorization }
+     },
+       function (error, response, body) {
+            if (!error && response.statusCode === 200) {
+                var j = JSON.parse(body);
+                resolve(j);
+            } else {
+                console.log('body:', body);
+                reject({
+                    error: error,
+                    response: response,
+                    body: body
+                });
+            }
+        });
+    });
+  
+    return promise
+  
+   }//discovery End
+}// End Main
+
+
+  
